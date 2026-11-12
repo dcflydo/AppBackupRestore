@@ -1,0 +1,26 @@
+<Window x:Class="AppBackupRestore.RegistryInputDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="添加注册表项" Height="200" Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" x:Name="RegKeyLabel" Text="注册表路径" FontSize="13" Margin="0,0,0,8"/>
+        <TextBox Grid.Row="1" x:Name="RegKeyTextBox" FontFamily="Consolas" FontSize="13"
+                 ToolTip="例如: HKLM\SOFTWARE\MySoftware"/>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button x:Name="CancelButton" Content="取消" Style="{StaticResource SecondaryButton}"
+                    Click="Cancel_Click" Margin="0,0,8,0" Padding="16,8"/>
+            <Button x:Name="OKButton" Content="确定" Style="{StaticResource PrimaryButton}"
+                    Click="OK_Click" Padding="16,8"/>
+        </StackPanel>
+    </Grid>
+</Window>

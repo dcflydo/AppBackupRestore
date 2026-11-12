@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>AppBackupRestore</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>AppBackupRestore</AssemblyName>
+    <Product>软件备份与还原</Product>
+    <Version>2.1.0</Version>  <!-- 版本号同步到 settings.ini -->
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <Description>Windows 软件备份与还原工具</Description>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Update="settings.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <None Update="lang\*.lng">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <Resource Include="app.ico" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,940 @@
+<Window x:Class="AppBackupRestore.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:AppBackupRestore.ViewModels"
+        Title="{DynamicResource l10n.ui.title}" Height="720" Width="1100"
+        MinHeight="620" MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource BgPage}"
+        Icon="pack://application:,,,/app.ico"
+        KeyDown="Window_KeyDown">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Grid>
+        <!-- ==================== 主界面 ==================== -->
+        <Grid Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibilityInverse}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="52"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 标题栏 -->
+            <Border Grid.Row="0" Background="{DynamicResource BgTitleBar}"
+                    BorderBrush="{DynamicResource BorderCard}" BorderThickness="0,0,0,1">
+                <Grid Margin="20,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 概览统计 -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- 第三方软件 -->
+                        <Border Background="{DynamicResource BadgeBlueBg}" CornerRadius="6" Padding="12,6" Margin="0,0,12,0">
+                            <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{DynamicResource l10n.ui.badge.thirdParty}" FontSize="12" Foreground="{DynamicResource BadgeBlueFg}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock Text="{Binding BackupVM.ThirdPartyCount}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource BadgeBlueFg}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <!-- 系统软件 -->
+                        <Border Background="{DynamicResource BadgeGreenBg}" CornerRadius="6" Padding="12,6" Margin="0,0,12,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{DynamicResource l10n.ui.badge.system}" FontSize="12" Foreground="{DynamicResource BadgeGreenFg}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="{Binding BackupVM.SystemCount}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource BadgeGreenFg}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <!-- 框架软件 -->
+                        <Border Background="{DynamicResource BadgeOrangeBg}" CornerRadius="6" Padding="12,6" Margin="0,0,12,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{DynamicResource l10n.ui.badge.framework}" FontSize="12" Foreground="{DynamicResource BadgeOrangeFg}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="{Binding BackupVM.FrameworkCount}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource BadgeOrangeFg}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <!-- 已备份 -->
+                        <Border Background="{DynamicResource BadgeBlueBg}" CornerRadius="6" Padding="12,6" Margin="0,0,12,0">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{DynamicResource l10n.ui.badge.backedUp}" FontSize="12" Foreground="{DynamicResource BadgeBlueFg}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="{Binding BackupVM.BackedUpCount}" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource BadgeBlueFg}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- 设置按钮 -->
+                    <Button Grid.Column="1" Content="{DynamicResource l10n.ui.btn.settings}" Style="{StaticResource SecondaryButton}"
+                            Command="{Binding OpenSettingsCommand}" Padding="14,6"
+                            VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+
+            <!-- Tab 切换 -->
+            <Grid Grid.Row="1" Margin="20,16,20,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- 标签栏 -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                    <Button x:Name="TabBackupBtn" Content="{DynamicResource l10n.ui.tab.backup}" FontSize="13" FontWeight="SemiBold"
+                            Padding="16,10" Background="{DynamicResource TabInactiveBg}" BorderThickness="0"
+                            Foreground="{Binding SelectedTab, Converter={StaticResource TabColorConverter0}}"
+                            Click="TabBackup_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                        CornerRadius="8,8,0,0" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="bd" Property="Background" Value="{DynamicResource TabInactiveHover}"/>
+                                    </Trigger>
+                                    <DataTrigger Binding="{Binding SelectedTab}" Value="0">
+                                        <Setter TargetName="bd" Property="Background" Value="{DynamicResource TabActiveBg}"/>
+                                    </DataTrigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <Button x:Name="TabRestoreBtn" Content="{DynamicResource l10n.ui.tab.restore}" FontSize="13" FontWeight="SemiBold"
+                            Padding="16,10" Background="{DynamicResource TabInactiveBg}" BorderThickness="0"
+                            Foreground="{Binding SelectedTab, Converter={StaticResource TabColorConverter1}}"
+                            Click="TabRestore_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                        CornerRadius="8,8,0,0" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="bd" Property="Background" Value="{DynamicResource TabInactiveHover}"/>
+                                    </Trigger>
+                                    <DataTrigger Binding="{Binding SelectedTab}" Value="1">
+                                        <Setter TargetName="bd" Property="Background" Value="{DynamicResource TabActiveBg}"/>
+                                    </DataTrigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <!-- 选中指示线 -->
+                    <Border x:Name="TabIndicator" Height="3" VerticalAlignment="Bottom"
+                            Background="{DynamicResource AccentBlue}" CornerRadius="1.5"
+                            Margin="4,0" Visibility="Collapsed"/>
+                </StackPanel>
+
+                <!-- 内容区域 -->
+                <Grid Grid.Row="1" Background="{DynamicResource BgPage}">
+                    <!-- 备份页内容 -->
+                    <UserControl DataContext="{Binding BackupVM}" x:Name="BackupContent"
+                                 Visibility="{Binding DataContext.SelectedTab, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TabIndexToVisibilityConverter0}}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- 扫描栏 + 筛选栏（合并为一行，左对齐） -->
+                            <Border Grid.Row="0" Background="{DynamicResource BgCard}"
+                                    CornerRadius="10" Padding="16,12" Margin="0,12,0,12">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="{DynamicResource l10n.backup.btn.scan}" Style="{StaticResource PrimaryButton}"
+                                            Command="{Binding ScanCommand}" Margin="0,0,16,0" Padding="16,8"/>
+                                    <TextBlock Text="{Binding LoadedCountLabel}"
+                                               VerticalAlignment="Center" FontSize="13"
+                                               Foreground="{DynamicResource TextSecondary}" Margin="0,0,16,0"
+                                               MinWidth="140"/>
+                                    <ProgressBar IsIndeterminate="True" Width="100" Margin="0,0,0,0"
+                                                 Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibility}}"/>
+                                    <Border Width="1" Background="{DynamicResource BorderCard}" Margin="16,0"/>
+
+                                    <!-- 搜索 -->
+                                    <TextBox Width="200" Style="{StaticResource SearchTextBox}"
+                                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Border Width="1" Background="{DynamicResource BorderCard}" Margin="16,0"/>
+
+                                    <TextBlock Text="{DynamicResource l10n.backup.label.disk}" VerticalAlignment="Center" FontSize="13"
+                                               Foreground="{DynamicResource TextSecondary}" Margin="0,0,8,0"/>
+                                    <ComboBox Width="90" ItemsSource="{Binding DiskOptions}"
+                                              SelectedItem="{Binding SelectedDisk}" Margin="0,0,16,0">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock>
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding}" Value="">
+                                                                    <Setter Property="Text" Value="{DynamicResource l10n.backup.filter.all}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <TextBlock Text="{DynamicResource l10n.backup.label.type}" VerticalAlignment="Center" FontSize="13"
+                                               Foreground="{DynamicResource TextSecondary}" Margin="0,0,8,0"/>
+                                    <ComboBox Width="120" ItemsSource="{Binding TypeOptions}"
+                                              SelectedItem="{Binding SelectedType}" Margin="0,0,16,0">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock>
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding}" Value="">
+                                                                    <Setter Property="Text" Value="{DynamicResource l10n.backup.filter.all}"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding}" Value="system">
+                                                                    <Setter Property="Text" Value="{DynamicResource l10n.backup.filter.system}"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding}" Value="thirdParty">
+                                                                    <Setter Property="Text" Value="{DynamicResource l10n.backup.filter.thirdParty}"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding}" Value="framework">
+                                                                    <Setter Property="Text" Value="{DynamicResource l10n.backup.filter.framework}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <TextBlock Text="{DynamicResource l10n.backup.label.status}" VerticalAlignment="Center" FontSize="13"
+                                               Foreground="{DynamicResource TextSecondary}" Margin="0,0,8,0"/>
+                                    <ComboBox Width="100" ItemsSource="{Binding StatusOptions}"
+                                              SelectedItem="{Binding SelectedStatus}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock>
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding}" Value="">
+                                                                    <Setter Property="Text" Value="{DynamicResource l10n.backup.filter.all}"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding}" Value="backedUp">
+                                                                    <Setter Property="Text" Value="{DynamicResource l10n.backup.filter.backedUp}"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding}" Value="notBackedUp">
+                                                                    <Setter Property="Text" Value="{DynamicResource l10n.backup.filter.notBackedUp}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 软件列表（可滚动） -->
+                            <Border Grid.Row="1" Background="{DynamicResource BgCard}" CornerRadius="10">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="44"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- 表头 -->
+                                    <Border Grid.Row="0" Background="{DynamicResource HeaderBg}"
+                                            CornerRadius="10,10,0,0"
+                                            BorderBrush="{DynamicResource BorderCard}" BorderThickness="0,0,0,1">
+                                        <Grid Margin="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="50"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="100"/>
+                                                <ColumnDefinition Width="100"/>
+                                                <ColumnDefinition Width="220"/>
+                                                <ColumnDefinition Width="70"/>
+                                                <ColumnDefinition Width="90"/>
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Grid.Column="0" Content="" IsChecked="{Binding IsAllSelected}"
+                                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                      ToolTip="{DynamicResource l10n.backup.col.selectAll}"/>
+                                            <TextBlock Grid.Column="1" Text="{DynamicResource l10n.backup.col.name}" FontWeight="SemiBold" FontSize="12"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       VerticalAlignment="Center" Margin="12,0"/>
+                                            <TextBlock Grid.Column="2" Text="{DynamicResource l10n.backup.col.version}" FontWeight="SemiBold" FontSize="12"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Left"
+                                                       TextAlignment="Left"/>
+                                            <TextBlock Grid.Column="3" Text="{DynamicResource l10n.backup.col.size}" FontWeight="SemiBold" FontSize="12"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Left"
+                                                       TextAlignment="Left"/>
+                                            <TextBlock Grid.Column="4" Text="{DynamicResource l10n.backup.col.path}" FontWeight="SemiBold" FontSize="12"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Left"
+                                                       TextAlignment="Left"
+                                                       Margin="12,0"/>
+                                            <TextBlock Grid.Column="5" Text="{DynamicResource l10n.backup.col.status}" FontWeight="SemiBold" FontSize="12"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Left"
+                                                       TextAlignment="Left"/>
+                                            <TextBlock Grid.Column="6" Text="{DynamicResource l10n.backup.col.type}" FontWeight="SemiBold" FontSize="12"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Left"
+                                                       TextAlignment="Left"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- 列表内容 -->
+                                    <ListBox Grid.Row="1"
+                                             ItemsSource="{Binding FilteredSoftwareView}"
+                                             BorderThickness="0"
+                                             Background="Transparent"
+                                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                             VirtualizingPanel.IsVirtualizing="True"
+                                             VirtualizingPanel.VirtualizationMode="Recycling">
+                                            <ListBox.ItemContainerStyle>
+                                                <Style TargetType="ListBoxItem">
+                                                    <Setter Property="Padding" Value="0"/>
+                                                    <Setter Property="Margin" Value="0"/>
+                                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="ListBoxItem">
+                                                                <Border x:Name="Bd" Background="Transparent"
+                                                                        BorderBrush="{DynamicResource RowSeparator}"
+                                                                        BorderThickness="0,0,0,1">
+                                                                    <Grid MinHeight="46">
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="50"/>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="100"/>
+                                                                            <ColumnDefinition Width="100"/>
+                                                                            <ColumnDefinition Width="220"/>
+                                                                            <ColumnDefinition Width="70"/>
+                                                                            <ColumnDefinition Width="90"/>
+                                                                        </Grid.ColumnDefinitions>
+
+                                                                        <!-- 勾选 -->
+                                                                        <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                                                  IsEnabled="{Binding Type, Converter={StaticResource TypeToCheckBoxEnabled}}"
+                                                                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                                                                        <!-- 软件名 -->
+                                                                        <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                                                   FontWeight="SemiBold" FontSize="13"
+                                                                                   Foreground="{DynamicResource TextPrimary}"
+                                                                                   VerticalAlignment="Center"
+                                                                                   TextTrimming="CharacterEllipsis"
+                                                                                   Margin="12,0"/>
+
+                                                                        <!-- 版本 -->
+                                                                        <TextBlock Grid.Column="2" Text="{Binding Version}"
+                                                                                   FontSize="12"
+                                                                                   Foreground="{DynamicResource TextSecondary}"
+                                                                                   VerticalAlignment="Center"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   TextAlignment="Center"
+                                                                                   TextTrimming="CharacterEllipsis"/>
+
+                                                                        <!-- 大小 -->
+                                                                        <TextBlock Grid.Column="3" Text="{Binding SizeLabel}"
+                                                                                   FontSize="12"
+                                                                                   Foreground="{DynamicResource TextSecondary}"
+                                                                                   VerticalAlignment="Center"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   TextAlignment="Center"/>
+
+                                                                        <!-- 安装路径（可点击） -->
+                                                                        <TextBlock Grid.Column="4" Text="{Binding InstallPath}"
+                                                                                   FontSize="12" Foreground="#0078D4"
+                                                                                   TextDecorations="Underline" Cursor="Hand"
+                                                                                   VerticalAlignment="Center"
+                                                                                   TextTrimming="CharacterEllipsis"
+                                                                                   ToolTip="{Binding InstallPath}"
+                                                                                   Margin="12,0"
+                                                                                   MouseLeftButtonDown="Path_DoubleClick"/>
+
+                                                                        <!-- 类型标签 -->
+                                                                        <Border Grid.Column="6" CornerRadius="4" Padding="8,3"
+                                                                                Background="{Binding Type, Converter={StaticResource TypeToColor}}"
+                                                                                HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                            <TextBlock Text="{Binding TypeLabel}" FontSize="11"
+                                                                                       Foreground="White" FontWeight="SemiBold"
+                                                                                       TextAlignment="Center"/>
+                                                                        </Border>
+
+                                                                        <!-- 备份状态 -->
+                                                                        <TextBlock Grid.Column="5" Text="{Binding BackupStatus}"
+                                                                                   FontSize="12"
+                                                                                   Foreground="{Binding IsBackedUp, Converter={StaticResource BackupStatusToColorConverter}}"
+                                                                                   VerticalAlignment="Center"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   TextAlignment="Center"
+                                                                                   Margin="4,0"/>
+                                                                    </Grid>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                                                        <Setter TargetName="Bd" Property="Background"
+                                                                                Value="{DynamicResource RowAlt}"/>
+                                                                    </Trigger>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter TargetName="Bd" Property="Background"
+                                                                                Value="{DynamicResource BgHover}"/>
+                                                                    </Trigger>
+                                                                    <Trigger Property="IsSelected" Value="True">
+                                                                        <Setter TargetName="Bd" Property="Background"
+                                                                                Value="{DynamicResource BgSelected}"/>
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </ListBox.ItemContainerStyle>
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid/>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                            <ListBox.AlternationCount>2</ListBox.AlternationCount>
+                                        </ListBox>
+
+                                    <!-- 空状态 -->
+                                    <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                Visibility="{Binding FilteredSoftwareView.Count, Converter={StaticResource CountToVisibilityWhenEmpty}}">
+                                        <TextBlock Text="暂无软件" FontSize="14"
+                                                   Foreground="{DynamicResource TextMuted}"
+                                                   HorizontalAlignment="Center"/>
+                                        <TextBlock Text="点击上方「扫描软件」开始" FontSize="12"
+                                                   Foreground="{DynamicResource TextMuted}"
+                                                   HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <!-- 底部操作栏（始终固定在底部） -->
+                            <Border Grid.Row="2" Background="{DynamicResource BgCard}"
+                                    CornerRadius="10" Padding="16,12" Margin="0,12,0,8">
+                                <Grid>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <CheckBox Content="{DynamicResource l10n.backup.col.selectAll}" IsChecked="{Binding IsAllSelected}"
+                                                  VerticalAlignment="Center" FontSize="13"/>
+                                        <TextBlock Text="{Binding SelectedCountLabel}"
+                                                   Margin="16,0,0,0" VerticalAlignment="Center" FontSize="13"
+                                                   Foreground="{DynamicResource TextSecondary}"/>
+                                    </StackPanel>
+                                    <Button Content="{DynamicResource l10n.backup.btn.startBackup}" Style="{StaticResource PrimaryButton}"
+                                            HorizontalAlignment="Right" Padding="20,10"
+                                            FontSize="14" Command="{Binding StartBackupCommand}"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </UserControl>
+
+                        <!-- 还原页内容 -->
+                        <UserControl DataContext="{Binding RestoreVM}" x:Name="RestoreContent"
+                                     Visibility="{Binding DataContext.SelectedTab, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource TabIndexToVisibilityConverter1}}">
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="300"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- 左侧备份列表 -->
+                                <Border Grid.Column="0" Background="{DynamicResource BgCard}"
+                                        CornerRadius="10" Margin="0,0,12,8">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <StackPanel Orientation="Horizontal" Margin="16,12,8,8">
+                                            <TextBlock Text="{DynamicResource l10n.restore.title}" FontSize="13" FontWeight="SemiBold"
+                                                       VerticalAlignment="Center"
+                                                       Foreground="{DynamicResource TextPrimary}"/>
+                                            <Button Content="{DynamicResource l10n.restore.btn.refresh}" Style="{StaticResource IconButton}"
+                                                    Command="{Binding RefreshCommand}"
+                                                    ToolTip="{DynamicResource l10n.restore.btn.refreshTip}" FontSize="14"/>
+                                        </StackPanel>
+                                        <ListBox Grid.Row="1" ItemsSource="{Binding Backups}"
+                                                 SelectedItem="{Binding SelectedBackup}"
+                                                 BorderThickness="0" Background="Transparent"
+                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                            <ListBox.ItemContainerStyle>
+                                                <Style TargetType="ListBoxItem">
+                                                    <Setter Property="Padding" Value="16,10"/>
+                                                    <Setter Property="Margin" Value="4,1"/>
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                    <Setter Property="BorderThickness" Value="0"/>
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="ListBoxItem">
+                                                                <Border x:Name="bd" Background="{TemplateBinding Background}"
+                                                                        CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                                                    <ContentPresenter/>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <Trigger Property="IsSelected" Value="True">
+                                                                        <Setter TargetName="bd" Property="Background" Value="{DynamicResource BgSelected}"/>
+                                                                    </Trigger>
+                                                                    <MultiTrigger>
+                                                                        <MultiTrigger.Conditions>
+                                                                            <Condition Property="IsMouseOver" Value="True"/>
+                                                                            <Condition Property="IsSelected" Value="False"/>
+                                                                        </MultiTrigger.Conditions>
+                                                                        <Setter TargetName="bd" Property="Background" Value="{DynamicResource BgHover}"/>
+                                                                    </MultiTrigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </ListBox.ItemContainerStyle>
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding SoftwareName}" FontWeight="SemiBold"
+                                                                       FontSize="13" TextTrimming="CharacterEllipsis"
+                                                                       Foreground="{DynamicResource TextPrimary}"/>
+                                                            <!-- 文件不存在警告 -->
+                                                            <TextBlock Text="⚠️" FontSize="12"
+                                                                       Visibility="{Binding BackupDirExists, Converter={StaticResource BoolToVisibilityInverse}}"
+                                                                       ToolTip="{Binding BackupDir}" Margin="4,0,0,0"
+                                                                       Foreground="#FF9800" VerticalAlignment="Center"/>
+                                                        </StackPanel>
+                                                        <TextBlock Text="{Binding BackupTime, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}"
+                                                                   FontSize="12" Margin="0,3,0,0"
+                                                                   Foreground="{DynamicResource TextMuted}"/>
+                                                        <TextBlock Text="{Binding BackupSize, Converter={StaticResource FileSize}}"
+                                                                   FontSize="12"
+                                                                   Foreground="{DynamicResource TextMuted}"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 右侧详情 -->
+                                <Border Grid.Column="1" Background="{DynamicResource BgCard}"
+                                        CornerRadius="10" Padding="24" Margin="0,0,0,8">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- 选中信息 + 操作按钮 -->
+                                        <Grid Visibility="{Binding SelectedBackup, Converter={StaticResource NullToVisibility}}">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding SelectedBackup.SoftwareName}"
+                                                           FontSize="18" FontWeight="Bold"
+                                                           Foreground="{DynamicResource TextPrimary}"/>
+                                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                                    <TextBlock Text="{DynamicResource l10n.restore.col.version}" FontSize="13" Foreground="{DynamicResource TextMuted}"/>
+                                                    <TextBlock Text="{Binding SelectedBackup.SoftwareVersion}"
+                                                               FontSize="13" Foreground="{DynamicResource TextSecondary}"/>
+                                                    <TextBlock Text="{DynamicResource l10n.restore.col.backupTime}" FontSize="13" Foreground="{DynamicResource TextMuted}" Margin="20,0,0,0"/>
+                                                    <TextBlock Text="{Binding SelectedBackup.BackupTime, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}"
+                                                               FontSize="13" Foreground="{DynamicResource TextSecondary}"/>
+                                                    <TextBlock Text="{DynamicResource l10n.restore.col.size}" FontSize="13" Foreground="{DynamicResource TextMuted}" Margin="20,0,0,0"/>
+                                                    <TextBlock Text="{Binding SelectedBackup.BackupSize, Converter={StaticResource FileSize}}"
+                                                               FontSize="13" Foreground="{DynamicResource TextSecondary}"/>
+                                                    <!-- 文件不存在警告 -->
+                                                    <TextBlock Text="{DynamicResource l10n.restore.warning.missing}" FontSize="12"
+                                                               Visibility="{Binding SelectedBackup.BackupDirExists, Converter={StaticResource BoolToVisibilityInverse}}"
+                                                               Foreground="#FF9800" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                            <!-- 操作按钮 -->
+                                            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,0">
+                                                <Button Content="{DynamicResource l10n.restore.btn.openDir}" Style="{StaticResource SecondaryButton}"
+                                                        Command="{Binding OpenBackupDirCommand}" Margin="0,0,8,0"/>
+                                                <Button Content="{DynamicResource l10n.restore.btn.delete}" Style="{StaticResource DangerButton}"
+                                                        Command="{Binding DeleteBackupCommand}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <TextBlock Grid.Row="0" Text="{DynamicResource l10n.restore.empty.tip}"
+                                                   Visibility="{Binding SelectedBackup, Converter={StaticResource NullToVisibilityInverse}}"
+                                                   FontSize="14" Foreground="{DynamicResource TextMuted}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   Margin="0,60,0,0"/>
+
+                                                <!-- 备份内容列表 -->
+                                                <Border Grid.Row="1" Margin="0,16,0,0" Padding="0"
+                                                        Visibility="{Binding SelectedBackup, Converter={StaticResource NullToVisibility}}">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto"/>
+                                                            <RowDefinition Height="*"/>
+                                                        </Grid.RowDefinitions>
+                                                        <TextBlock Text="{DynamicResource l10n.restore.preview.title}" FontWeight="SemiBold" FontSize="13"
+                                                                   Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,8"/>
+                                                        <Border Grid.Row="1" BorderThickness="1" CornerRadius="6"
+                                                                BorderBrush="{DynamicResource BorderCard}"
+                                                                Background="{DynamicResource BgPage}">
+                                                            <ListBox BorderThickness="0"
+                                                                     Background="Transparent"
+                                                                     ItemsSource="{Binding SelectedDirectories}"
+                                                                     FontSize="12">
+                                                            <ListBox.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <TextBlock Text="{Binding}" FontFamily="Consolas"
+                                                                               TextTrimming="CharacterEllipsis"
+                                                                               Foreground="{DynamicResource TextSecondary}"
+                                                                               ToolTip="{Binding}" Margin="4,2"/>
+                                                                </DataTemplate>
+                                                            </ListBox.ItemTemplate>
+                                                        </ListBox>
+                                                        </Border>
+                                                    </Grid>
+                                                </Border>
+
+                                        <!-- 还原日志 -->
+                                        <Border Grid.Row="2" x:Name="RestoreLogArea" Background="{DynamicResource LogBg}"
+                                                CornerRadius="8" Margin="0,16,0,0" Padding="16"
+                                                MaxHeight="200"
+                                                Visibility="{Binding IsLogVisible, Converter={StaticResource BoolToVisibility}}">
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                <TextBlock Text="{Binding RestoreLog}"
+                                                           Foreground="{DynamicResource LogFg}"
+                                                           FontFamily="Consolas" FontSize="12"
+                                                           TextWrapping="Wrap"/>
+                                            </ScrollViewer>
+                                        </Border>
+
+                                        <!-- 进度 + 按钮 -->
+                                        <StackPanel Grid.Row="3" Margin="0,16,0,0">
+                                            <ProgressBar Value="{Binding RestoreProgress}" Maximum="100" Height="4"
+                                                         Visibility="{Binding IsRestoring, Converter={StaticResource BoolToVisibility}}"/>
+                                            <Button Content="▶ 开始还原" Style="{StaticResource PrimaryButton}"
+                                                    Command="{Binding StartRestoreCommand}"
+                                                    HorizontalAlignment="Right" Padding="20,10" FontSize="14"
+                                                    Margin="0,8,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </UserControl>
+                </Grid>
+            </Grid>
+
+            <!-- 底部状态栏 -->
+            <Border Grid.Row="2" Background="{DynamicResource BgTitleBar}"
+                    BorderBrush="{DynamicResource BorderCard}" BorderThickness="0,1,0,0"
+                    Padding="20,6">
+                <TextBlock Text="{Binding StatusMessage}" FontSize="12"
+                           Foreground="{DynamicResource TextMuted}"/>
+            </Border>
+        </Grid>
+
+        <!-- ==================== 设置弹窗 ==================== -->
+        <Grid Visibility="{Binding IsSettingsOpen, Converter={StaticResource BoolToVisibility}}">
+            <Border Background="#50000000"/>
+            <Border Background="{DynamicResource BgCard}" CornerRadius="14"
+                    Width="500" VerticalAlignment="Center" HorizontalAlignment="Center"
+                    Padding="32">
+                <StackPanel>
+                    <!-- 标题 -->
+                    <Grid Margin="0,0,0,28">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{DynamicResource l10n.settings.title}" FontSize="20" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextPrimary}"/>
+                            <TextBlock Text="{Binding AppVersion, StringFormat='  v{0}'}" 
+                                       FontSize="12" Foreground="{DynamicResource TextMuted}"
+                                       VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        </StackPanel>
+                        <Button Content="✕" Style="{StaticResource SecondaryButton}"
+                                Command="{Binding CloseSettingsCommand}"
+                                HorizontalAlignment="Right" Padding="8,4" FontSize="14"/>
+                    </Grid>
+
+                    <!-- 主题 -->
+                    <TextBlock Text="{DynamicResource l10n.settings.section.theme}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"
+                               Foreground="{DynamicResource TextPrimary}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+                        <RadioButton Content="{DynamicResource l10n.settings.theme.light}" GroupName="Theme" Margin="0,0,20,0"
+                                     IsChecked="{Binding Settings.Theme, Converter={StaticResource ThemeToLight}, Mode=TwoWay}"
+                                     Click="ThemeLight_Click"/>
+                        <RadioButton Content="{DynamicResource l10n.settings.theme.dark}" GroupName="Theme" Margin="0,0,20,0"
+                                     IsChecked="{Binding Settings.Theme, Converter={StaticResource ThemeToDark}, Mode=TwoWay}"
+                                     Click="ThemeDark_Click"/>
+                        <RadioButton Content="{DynamicResource l10n.settings.theme.system}" GroupName="Theme"
+                                     IsChecked="{Binding Settings.Theme, Converter={StaticResource ThemeToSystem}, Mode=TwoWay}"
+                                     Click="ThemeSystem_Click"/>
+                    </StackPanel>
+
+                    <!-- 语言 -->
+                    <TextBlock Text="{DynamicResource l10n.settings.section.language}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"
+                               Foreground="{DynamicResource TextPrimary}"/>
+                    <ComboBox x:Name="LanguageComboBox" Width="180" Margin="0,0,0,24" Padding="10,6"
+                              HorizontalAlignment="Left" SelectionChanged="LanguageComboBox_SelectionChanged">
+                        <ComboBoxItem Content="{DynamicResource l10n._lang.auto}" Tag=""/>
+                        <ComboBoxItem Content="{DynamicResource l10n._lang.zh-CN}" Tag="zh-CN"/>
+                        <ComboBoxItem Content="{DynamicResource l10n._lang.en-US}" Tag="en-US"/>
+                    </ComboBox>
+
+                    <!-- 备份目录 -->
+                    <TextBlock Text="{DynamicResource l10n.settings.section.backupDir}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"
+                               Foreground="{DynamicResource TextPrimary}"/>
+                    <Grid Margin="0,0,0,24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="{Binding Settings.BackupDirectory}" IsReadOnly="True"
+                                 Padding="10,8"/>
+                        <Button Grid.Column="1" Content="{DynamicResource l10n.settings.btn.browse}" Style="{StaticResource SecondaryButton}"
+                                Command="{Binding BrowseBackupDirCommand}" Margin="8,0,0,0" Padding="14,8"/>
+                    </Grid>
+
+                    <!-- 压缩等级 -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="{DynamicResource l10n.settings.section.compression}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CompressionComboBox" Padding="10,6" Width="160" Margin="8,0,0,0"
+                                  SelectedIndex="{Binding Settings.CompressionLevel}" VerticalAlignment="Center">
+                            <ComboBoxItem Content="{DynamicResource l10n.settings.compression.none}"/>
+                            <ComboBoxItem Content="{DynamicResource l10n.settings.compression.fast}"/>
+                            <ComboBoxItem Content="{DynamicResource l10n.settings.compression.standard}"/>
+                            <ComboBoxItem Content="{DynamicResource l10n.settings.compression.max}"/>
+                        </ComboBox>
+                    </StackPanel>
+                    <TextBlock Text="{DynamicResource l10n.settings.compression.hint}"
+                               FontSize="11" Foreground="{DynamicResource TextMuted}"
+                               Margin="0,0,0,28"/>
+
+                    <!-- 保存按钮 -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="{DynamicResource l10n.settings.btn.cancel}" Style="{StaticResource SecondaryButton}"
+                                Command="{Binding CloseSettingsCommand}" Margin="0,0,12,0" Padding="20,10"/>
+                        <Button Content="{DynamicResource l10n.settings.btn.save}" Style="{StaticResource PrimaryButton}"
+                                Command="{Binding SaveSettingsCommand}" Padding="24,10"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ==================== 分析进度弹窗 ==================== -->
+        <Grid Visibility="{Binding BackupVM.IsAnalyzing, Converter={StaticResource BoolToVisibility}}">
+            <Border Background="#50000000"/>
+            <Border Background="{DynamicResource BgCard}" CornerRadius="14" Padding="48"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center">
+                    <!-- 分析图标：放大镜 SVG，自适应主题颜色 -->
+                    <Viewbox Width="48" Height="48" HorizontalAlignment="Center">
+                        <Canvas Width="24" Height="24">
+                            <!-- 放大镜圆圈 -->
+                            <Ellipse Canvas.Left="2" Canvas.Top="2" Width="14" Height="14"
+                                     Stroke="{DynamicResource TextPrimary}" StrokeThickness="2"
+                                     Fill="Transparent"/>
+                            <!-- 放大镜手柄 -->
+                            <Line X1="14.1" Y1="14.1" X2="21" Y2="21"
+                                  Stroke="{DynamicResource TextPrimary}" StrokeThickness="2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        </Canvas>
+                    </Viewbox>
+                    <ProgressBar IsIndeterminate="True" Width="280" Height="4" Margin="0,20,0,0"/>
+                    <TextBlock Text="{Binding BackupVM.AnalyzeProgress}"
+                               HorizontalAlignment="Center" FontSize="13" Margin="0,12,0,0"
+                               Foreground="{DynamicResource TextSecondary}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- ==================== 确认备份内容弹窗 ==================== -->
+        <Grid Visibility="{Binding BackupVM.IsConfirmOpen, Converter={StaticResource BoolToVisibility}}">
+            <Border Background="#50000000"/>
+            <Border Background="{DynamicResource BgCard}" CornerRadius="14"
+                    Width="720" MaxHeight="620"
+                    VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 弹窗标题 -->
+                    <Border Grid.Row="0" Padding="24,16"
+                            BorderBrush="{DynamicResource BorderCard}" BorderThickness="0,0,0,1">
+                        <Grid>
+                            <TextBlock Text="{DynamicResource l10n.backup.confirm.title}" FontSize="17" FontWeight="Bold"
+                                       Foreground="{DynamicResource TextPrimary}"/>
+                            <Button Content="✕" Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding BackupVM.CancelConfirmCommand}"
+                                    HorizontalAlignment="Right" Padding="8,4" FontSize="14"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 内容列表 -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="24,12">
+                        <ItemsControl ItemsSource="{Binding BackupVM.CurrentDeps}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource RowAlt}"
+                                            CornerRadius="10" Margin="0,0,0,16" Padding="18">
+                                        <StackPanel>
+                                            <!-- 软件名 -->
+                                            <TextBlock Text="{Binding Software.Name}"
+                                                       FontWeight="Bold" FontSize="14"
+                                                       Foreground="{DynamicResource TextPrimary}"/>
+                                            <TextBlock Text="{Binding Software.InstallPath}"
+                                                       FontSize="11" Margin="0,4,0,14"
+                                                       Foreground="{DynamicResource TextMuted}"
+                                                       TextTrimming="CharacterEllipsis"/>
+
+<!-- 关联目录 -->
+                                            <Expander Header="{DynamicResource l10n.backup.confirm.sections.dirs}" IsExpanded="True" Margin="0,0,0,8"
+                                                       Foreground="{DynamicResource TextPrimary}">
+                                                <StackPanel Margin="0,8,0,0">
+                                                    <ItemsControl ItemsSource="{Binding Directories}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid Margin="0,3">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Text="{Binding}" FontSize="12"
+                                                                               Foreground="#0078D4"
+                                                                               TextDecorations="Underline"
+                                                                               Cursor="Hand" VerticalAlignment="Center"
+                                                                               TextTrimming="CharacterEllipsis"
+                                                                               ToolTip="{Binding}"
+                                                                               MouseLeftButtonDown="DepPath_DoubleClick"/>
+                                                                    <Button Grid.Column="1" Content="{DynamicResource l10n.backup.confirm.btn.remove}"
+                                                                            Style="{StaticResource SecondaryButton}"
+                                                                            Padding="6,2" FontSize="11" Margin="8,0,0,0"
+                                                                            Click="RemoveDir_Click" Tag="{Binding}"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                    <Button Content="{DynamicResource l10n.backup.confirm.btn.addDir}" Style="{StaticResource SecondaryButton}"
+                                                            HorizontalAlignment="Left" Padding="10,4" FontSize="12"
+                                                            Margin="0,8,0,0" Click="AddDir_Click" Tag="{Binding}"/>
+                                                </StackPanel>
+                                            </Expander>
+
+                                            <!-- 注册表项 -->
+                                            <Expander Header="{DynamicResource l10n.backup.confirm.sections.registry}"
+                                                       Foreground="{DynamicResource TextPrimary}">
+                                                <StackPanel Margin="0,8,0,0">
+                                                    <ItemsControl ItemsSource="{Binding RegistryKeys}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid Margin="0,3">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Text="{Binding}" FontSize="12"
+                                                                               FontFamily="Consolas"
+                                                                               Foreground="{DynamicResource TextSecondary}"
+                                                                               VerticalAlignment="Center"
+                                                                               TextTrimming="CharacterEllipsis"
+                                                                               ToolTip="{Binding}"/>
+                                                                    <Button Grid.Column="1" Content="{DynamicResource l10n.backup.confirm.btn.remove}"
+                                                                            Style="{StaticResource SecondaryButton}"
+                                                                            Padding="6,2" FontSize="11" Margin="8,0,0,0"
+                                                                            Click="RemoveReg_Click" Tag="{Binding}"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                    <Button Content="{DynamicResource l10n.backup.confirm.btn.addReg}" Style="{StaticResource SecondaryButton}"
+                                                            HorizontalAlignment="Left" Padding="10,4" FontSize="12"
+                                                            Margin="0,8,0,0" Click="AddReg_Click" Tag="{Binding}"/>
+                                                </StackPanel>
+                                            </Expander>
+
+                                            <!-- 其他文件（快捷方式、系统关联文件等） -->
+                                            <Expander Header="{DynamicResource l10n.backup.confirm.sections.otherFiles}"
+                                                       Foreground="{DynamicResource TextPrimary}">
+                                                <StackPanel Margin="0,8,0,0">
+                                                    <ItemsControl ItemsSource="{Binding OtherFiles}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid Margin="0,3">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="Auto"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <TextBlock Text="{Binding}" FontSize="12"
+                                                                               Foreground="{DynamicResource TextSecondary}"
+                                                                               VerticalAlignment="Center"
+                                                                               TextTrimming="CharacterEllipsis"
+                                                                               ToolTip="{Binding}"/>
+                                                                    <Button Grid.Column="1" Content="{DynamicResource l10n.backup.confirm.btn.remove}"
+                                                                            Style="{StaticResource SecondaryButton}"
+                                                                            Padding="6,2" FontSize="11" Margin="8,0,0,0"
+                                                                            Click="RemoveOther_Click" Tag="{Binding}"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                    <TextBlock Text="{DynamicResource l10n.backup.confirm.otherFilesHint}"
+                                                               FontSize="11" Margin="0,8,0,0"
+                                                               Foreground="{DynamicResource TextMuted}"/>
+                                                </StackPanel>
+                                            </Expander>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    
+                    <!-- 底部操作栏 -->
+                    <Border Grid.Row="2" Padding="24,16"
+                            BorderBrush="{DynamicResource BorderCard}" BorderThickness="0,1,0,0">
+                        <Grid>
+                            <!-- 进度条 -->
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                                        Visibility="{Binding BackupVM.IsBackingUp, Converter={StaticResource BoolToVisibility}}">
+                                <ProgressBar Width="200" Value="{Binding BackupVM.BackupProgress}"
+                                              Maximum="100" Height="4"/>
+                                <TextBlock Text="{Binding BackupVM.BackupProgress, StringFormat='{}{0}%'}"
+                                           Margin="12,0,0,0" FontSize="12"
+                                           Foreground="{DynamicResource TextSecondary}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            
+                            <!-- 按钮 -->
+                            <Button Content="{DynamicResource l10n.backup.confirm.btn.backup}" Style="{StaticResource PrimaryButton}"
+                                    Command="{Binding BackupVM.ConfirmBackupCommand}"
+                                    Visibility="{Binding BackupVM.IsBackingUp, Converter={StaticResource BoolToVisibilityInverse}}"
+                                    HorizontalAlignment="Right"
+                                    Padding="24,8" FontSize="14"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

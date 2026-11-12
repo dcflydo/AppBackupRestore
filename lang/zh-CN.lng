@@ -1,0 +1,131 @@
+# AppBackupRestore 简体中文翻译
+# 格式：key=value，# 开头为注释，\n 表示换行
+
+# 语言元信息
+_lang.zh-CN=简体中文
+_lang.en-US=English
+_lang.auto=🌐 跟随系统
+
+# ========== 主窗口标题栏 ==========
+ui.title=软件备份与还原
+ui.btn.settings=设置 ⚙
+
+# 标题栏徽章
+ui.badge.thirdParty=第三方
+ui.badge.system=系统
+ui.badge.framework=框架
+ui.badge.backedUp=已备份
+
+# 软件来源
+software.source.startMenu=开始菜单
+software.source.desktop=桌面
+
+# 标签页
+ui.tab.backup=备份
+ui.tab.restore=还原
+
+# ========== 备份页 ==========
+backup.btn.scan=🔍 扫描软件
+backup.label.loadedCount=已加载 {0} 个软件
+backup.label.disk=磁盘
+backup.label.type=类型
+backup.label.status=状态
+backup.filter.all=全部
+backup.filter.system=系统软件
+backup.filter.thirdParty=第三方软件
+backup.filter.framework=框架软件
+backup.filter.backedUp=已备份
+backup.filter.notBackedUp=未备份
+
+# 表头
+backup.col.selectAll=全选
+backup.col.name=软件名称
+backup.col.version=版本
+backup.col.size=大小
+backup.col.path=安装路径
+backup.col.status=状态
+backup.col.type=类型
+
+# 底部操作栏
+backup.btn.startBackup=▶ 开始备份
+backup.label.selectedCount=已选 {0} 个
+
+# 扫描状态
+backup.status.analyzing=正在分析...
+backup.status.analyzingProgress=正在分析 {0}/{1}: {2}
+backup.status.scanFailed=扫描失败: {0}
+
+# 备份执行
+backup.log.start=开始备份: {0}
+backup.log.complete=备份完成: {0} ({1:F1} KB)
+backup.log.completeDir=备份完成（目录模式）: {0}
+backup.log.failed=备份失败: {0}
+backup.log.allDone=全部完成！
+
+# 路径不存在提示
+backup.msg.pathNotFound=路径不存在:\n{0}
+
+# 确认弹窗
+backup.confirm.title=确认备份内容
+backup.confirm.sections.dirs=📁 关联目录
+backup.confirm.sections.registry=🗃 注册表项
+backup.confirm.sections.otherFiles=📋 其他文件
+backup.confirm.btn.addDir=+ 添加目录
+backup.confirm.btn.addReg=+ 添加注册表
+backup.confirm.btn.remove=移除
+backup.confirm.btn.backup=▶ 备份
+backup.confirm.otherFilesHint=快捷方式、系统关联文件等
+backup.confirm.dialog.addDirTitle=选择要添加的目录
+
+# ========== 还原页 ==========
+restore.title=备份记录
+restore.btn.refresh=🔄
+restore.btn.refreshTip=刷新
+restore.empty.tip=← 请选择要还原的备份
+restore.col.version=版本:
+restore.col.backupTime=备份时间:
+restore.col.size=大小:
+restore.warning.missing= ⚠️ 文件不存在
+restore.btn.openDir=📂 打开目录
+restore.btn.delete=🗑 删除
+restore.preview.title=备份内容预览
+restore.log.missingDir=错误：备份目录不存在，无法还原\n{0}
+restore.msg.missingDir=备份目录不存在：\n{0}
+restore.msg.deleteConfirm=确定要删除 "{0}" 的备份记录吗？\n备份目录:{1}
+restore.msg.deleteTitle=确认删除
+restore.log.complete=还原完成
+restore.log.failed=还原失败: {0}
+
+# ========== 设置弹窗 ==========
+settings.title=⚙ 设置
+settings.section.theme=外观主题
+settings.theme.light=浅色
+settings.theme.dark=深色
+settings.theme.system=跟随系统
+settings.section.language=界面语言
+settings.section.backupDir=备份存放目录
+settings.btn.browse=浏览
+settings.dialog.folderTitle=选择备份目录
+settings.section.compression=ZIP 压缩等级:
+settings.compression.none=不压缩 (速度最快)
+settings.compression.fast=快速
+settings.compression.standard=标准 (推荐)
+settings.compression.max=极限 (文件最小)
+settings.compression.hint=不压缩速度最快但文件最大；极限压缩文件最小但速度最慢
+settings.btn.cancel=取消
+settings.btn.save=保存
+settings.status.saved=设置已保存
+
+# ========== 注册表输入对话框 ==========
+registryInput.title=添加注册表项
+registryInput.label=注册表路径
+registryInput.tooltip=例如: HKLM\SOFTWARE\MySoftware
+registryInput.ok=确定
+registryInput.cancel=取消
+
+# ========== 通用 ==========
+common.error.title=错误
+common.tip.title=提示
+common.warning.title=警告
+common.msg.appRunning=应用程序已在运行。
+common.msg.uiException=UI异常:\n{0}\n\n{1}

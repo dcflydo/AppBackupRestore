@@ -1,0 +1,131 @@
+# AppBackupRestore English (US) Translation
+# Format: key=value, # starts a comment, \n means newline
+
+# Language meta
+_lang.zh-CN=简体中文
+_lang.en-US=English
+_lang.auto=🌐 Follow System
+
+# ========== Main Window Title Bar ==========
+ui.title=App Backup & Restore
+ui.btn.settings=Settings ⚙
+
+# Title bar badges
+ui.badge.thirdParty=Third-Party
+ui.badge.system=System
+ui.badge.framework=Framework
+ui.badge.backedUp=Backed Up
+
+# Software source
+software.source.startMenu=Start Menu
+software.source.desktop=Desktop
+
+# Tabs
+ui.tab.backup=Backup
+ui.tab.restore=Restore
+
+# ========== Backup Page ==========
+backup.btn.scan=🔍 Scan Software
+backup.label.loadedCount={0} apps loaded
+backup.label.disk=Disk
+backup.label.type=Type
+backup.label.status=Status
+backup.filter.all=All
+backup.filter.system=System
+backup.filter.thirdParty=Third-Party
+backup.filter.framework=Framework
+backup.filter.backedUp=Backed Up
+backup.filter.notBackedUp=Not Backed Up
+
+# Table headers
+backup.col.selectAll=Select All
+backup.col.name=Software Name
+backup.col.version=Version
+backup.col.size=Size
+backup.col.path=Install Path
+backup.col.status=Status
+backup.col.type=Type
+
+# Bottom action bar
+backup.btn.startBackup=▶ Start Backup
+backup.label.selectedCount={0} selected
+
+# Scan status
+backup.status.analyzing=Analyzing...
+backup.status.analyzingProgress=Analyzing {0}/{1}: {2}
+backup.status.scanFailed=Scan failed: {0}
+
+# Backup execution
+backup.log.start=Starting backup: {0}
+backup.log.complete=Backup complete: {0} ({1:F1} KB)
+backup.log.completeDir=Backup complete (folder mode): {0}
+backup.log.failed=Backup failed: {0}
+backup.log.allDone=All done!
+
+# Path not found
+backup.msg.pathNotFound=Path not found:\n{0}
+
+# Confirm dialog
+backup.confirm.title=Confirm Backup Contents
+backup.confirm.sections.dirs=📁 Related Directories
+backup.confirm.sections.registry=🗃 Registry Keys
+backup.confirm.sections.otherFiles=📋 Other Files
+backup.confirm.btn.addDir=+ Add Directory
+backup.confirm.btn.addReg=+ Add Registry Key
+backup.confirm.btn.remove=Remove
+backup.confirm.btn.backup=▶ Backup
+backup.confirm.otherFilesHint=Shortcuts, system-related files, etc.
+backup.confirm.dialog.addDirTitle=Select directory to add
+
+# ========== Restore Page ==========
+restore.title=Backup Records
+restore.btn.refresh=🔄
+restore.btn.refreshTip=Refresh
+restore.empty.tip=← Select a backup to restore
+restore.col.version=Version:
+restore.col.backupTime=Backup Time:
+restore.col.size=Size:
+restore.warning.missing= ⚠️ File missing
+restore.btn.openDir=📂 Open Folder
+restore.btn.delete=🗑 Delete
+restore.preview.title=Backup Contents Preview
+restore.log.missingDir=Error: backup directory does not exist, cannot restore\n{0}
+restore.msg.missingDir=Backup directory does not exist:\n{0}
+restore.msg.deleteConfirm=Delete the backup record for "{0}"?\nBackup folder: {1}
+restore.msg.deleteTitle=Confirm Delete
+restore.log.complete=Restore complete
+restore.log.failed=Restore failed: {0}
+
+# ========== Settings Dialog ==========
+settings.title=⚙ Settings
+settings.section.theme=Appearance Theme
+settings.theme.light=Light
+settings.theme.dark=Dark
+settings.theme.system=Follow System
+settings.section.language=Interface Language
+settings.section.backupDir=Backup Storage Directory
+settings.btn.browse=Browse
+settings.dialog.folderTitle=Select Backup Directory
+settings.section.compression=ZIP Compression Level:
+settings.compression.none=None (Fastest)
+settings.compression.fast=Fast
+settings.compression.standard=Standard (Recommended)
+settings.compression.max=Maximum (Smallest File)
+settings.compression.hint=None is fastest but produces the largest file; Maximum is the smallest file but slowest
+settings.btn.cancel=Cancel
+settings.btn.save=Save
+settings.status.saved=Settings saved
+
+# ========== Registry Input Dialog ==========
+registryInput.title=Add Registry Key
+registryInput.label=Registry Path
+registryInput.tooltip=Example: HKLM\SOFTWARE\MySoftware
+registryInput.ok=OK
+registryInput.cancel=Cancel
+
+# ========== Common ==========
+common.error.title=Error
+common.tip.title=Notice
+common.warning.title=Warning
+common.msg.appRunning=Application is already running.
+common.msg.uiException=UI Exception:\n{0}\n\n{1}
