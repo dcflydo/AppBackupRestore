@@ -1,10 +1,6 @@
 # 软件备份与还原 (AppBackupRestore)
 
 <p align="center">
-  AppBackupRestore
-</p>
-
-<p align="center">
   <a href="#"><img src="https://img.shields.io/badge/.NET-8.0-blue" alt=".NET 8"></a>
   <a href="#"><img src="https://img.shields.io/badge/UI-WPF-9cf" alt="WPF"></a>
   <a href="#"><img src="https://img.shields.io/badge/Platform-Windows%2010%2F11-lightgrey" alt="Windows"></a>
