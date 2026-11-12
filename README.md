@@ -1,7 +1,7 @@
 # 软件备份与还原 (AppBackupRestore)
 
 <p align="center">
-  <img src="app.ico" alt="AppBackupRestore" width="96" height="96">
+  AppBackupRestore
 </p>
 
 <p align="center">
