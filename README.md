@@ -1,6 +1,5 @@
-# 软件备份与还原 (AppBackupRestore)
-
 <p align="center">
+  # 软件备份与还原 (AppBackupRestore)
   <a href="#"><img src="https://img.shields.io/badge/.NET-8.0-blue" alt=".NET 8"></a>
   <a href="#"><img src="https://img.shields.io/badge/UI-WPF-9cf" alt="WPF"></a>
   <a href="#"><img src="https://img.shields.io/badge/Platform-Windows%2010%2F11-lightgrey" alt="Windows"></a>
@@ -12,6 +11,8 @@
 > 不再因为重装系统、更换电脑而丢失软件配置；备份内容由工具进行分析推断，可手动添加需要备份的文件和注册表。
 
 ---
+
+<p align="center">本项目为AI作品，目前开源发布是因为市面大多数类似软件是收费的，而目前本版本已经可以日常使用。</p>
 
 ## ✨ 功能特性
 
@@ -149,5 +150,3 @@ AppBackupRestore/
 本项目使用GPL-3.0开源许可证。任何分发基于 GPL 代码的产品，必须以 GPL 协议开源整个项目源码。
 
 ---
-
-<p align="center">本项目为AI作品，目前开源发布是因为已经可以日常使用。</p>
